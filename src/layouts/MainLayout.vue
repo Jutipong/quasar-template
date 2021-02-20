@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh LpR fFf" class="bg-grey-1">
+  <q-layout view="hHh LpR fFf" class="bg-grey-1 shadow-2 rounded-borders">
     <q-header elevated class="text-dark bg-blue-8">
       <q-toolbar>
         <q-btn
@@ -10,6 +10,7 @@
           aria-label="Menu"
           icon="menu"
         />
+        <q-separator vertical inset />
 
         <!-- <q-btn flat no-caps no-wrap class="q-ml-xs" v-if="$q.screen.gt.xs">
           <q-icon :name="fabYoutube" color="red" size="28px" />
@@ -41,13 +42,21 @@
       :width="240"
     >
       <q-scroll-area class="fit">
-        <q-list padding>
-          <div v-for="(group, index) in menus" :key="index">
+        <q-list padding class="menu-list">
+          <div v-for="(menu, index) in menus" :key="index">
             <q-item-label header class="text-weight-bold text-uppercase">
-              <q-icon :name="group.icon" />
-              {{ group.title }}
+              <q-icon :name="menu.icon" />
+              {{ menu.title }}
             </q-item-label>
-            <q-item v-for="link in group.links" :key="link.route" v-ripple clickable>
+            <q-item
+              dense
+              v-for="link in menu.links"
+              :key="link.route"
+              v-ripple
+              clickable
+              :active="link.active"
+              active-class="bg-blue-2"
+            >
               <q-item-section avatar>
                 <q-icon color="grey" :name="link.icon" />
               </q-item-section>
@@ -59,6 +68,8 @@
             <q-separator inset class="q-my-sm" />
           </div>
         </q-list>
+
+        <!-- <q-space />tt -->
       </q-scroll-area>
     </q-drawer>
     <q-page-container>
@@ -77,35 +88,70 @@
   </q-layout>
 </template>
 
-<script>
-import { fabYoutube } from '@quasar/extras/fontawesome-v5'
-export default {
-  name: "MyLayout",
-  data() {
+<script lang="ts">
+import { defineComponent, reactive, ref } from 'vue'
+
+export interface MenuModel {
+  id: number;
+  title: string;
+  icon: string;
+  links: LinkModel[]
+}
+export interface LinkModel {
+  icon: string;
+  text: string;
+  route: string;
+  active: boolean;
+}
+
+export default defineComponent({
+  name: 'MainLayout',
+  setup() {
+    const leftDrawerOpen = ref(false);
+    const menus = reactive<MenuModel[]>([
+      {
+        id: 1,
+        title: "Home demo",
+        icon: 'home',
+        links: [
+          {
+            icon: "videogame_asset",
+            text: "demo1",
+            route: "demo1",
+            active: true
+          },
+        ],
+      },
+      {
+        id: 2,
+        title: "Home demo 2",
+        icon: 'home',
+        links: [
+          {
+            icon: "home",
+            text: "demo2",
+            route: "demo2",
+            active: false
+          }
+        ]
+      },
+    ]);
+
     return {
-      leftDrawerOpen: false,
-      menus: [
-        {
-          title: "Home demo",
-          icon: 'home',
-          links: [
-            { icon: "videogame_asset", text: "demo1", route: "demo1" },
-          ],
-          active: false
-        },
-        {
-          title: "Home demo 2",
-          icon: 'home',
-          links: [
-            { icon: "home", text: "demo2", route: "demo2" }
-          ],
-          active: false
-        },
-      ],
-    };
-  },
-  created() {
-    this.fabYoutube = fabYoutube;
-  },
-};
-</script>
+      leftDrawerOpen,
+      menus
+    }
+  }
+})
+</script> 
+
+<style lang="scss" scoped>
+.menu-list .q-item {
+  border-radius: 0 20px 20px 0;
+  margin-right: 5px;
+}
+.q-list--dense > .q-item,
+.q-item--dense {
+  min-height: 40px;
+}
+</style>
